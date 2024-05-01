@@ -4,12 +4,193 @@
 <head>
     <meta charset="UTF-8">
     <title>Marketplace</title>
+    <style>
+        #transactionHashContainer {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #4CAF50;
+            text-size-adjust: 1rem;
+        }
+
+        #transactionHashLink {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        #transactionHashLink:hover {
+            text-decoration: underline;
+        }
+
+        .connect-wallet-container {
+            position: absolute;
+            /* Position it absolutely relative to the next positioned parent */
+            top: 10px;
+            /* Adjust this value to move it up or down */
+            left: 20px;
+            /* Adjust left spacing */
+        }
+
+        button#connectWallet {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button#connectWallet:hover {
+            background-color: #367c39;
+        }
+
+
+
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            z-index: 10000;
+            display: none;
+            width: auto;
+            min-width: 250px;
+            max-width: 80%;
+            box-sizing: border-box;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background-color: #28a745;
+        }
+
+        .toast.error {
+            background-color: #dc3545;
+        }
+
+        @keyframes fadein {
+            from {
+                top: 0;
+                opacity: 0;
+            }
+
+            to {
+                top: 20px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                top: 20px;
+                opacity: 1;
+            }
+
+            to {
+                top: 0;
+                opacity: 0;
+            }
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            color: black;
+            text-align: center;
+            font-size: 4rem;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 2rem;
+        }
+
+        button,
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .item-section {
+            flex: 1;
+        }
+
+        .sold {
+            color: red;
+        }
+
+        .not-sold {
+            color: green;
+        }
+
+        @media (min-width: 768px) {
+            .item-section {
+                flex: 0 0 25%;
+            }
+        }
+    </style>
 </head>
 
 <body>
     <h1>Ethereum Marketplace</h1>
+    <div class="connect-wallet-container"><button id="connectWallet">Connect Wallet</button></div>
 
-    <button id="connectWallet">Connect Wallet</button>
+    <!-- Transaction Hash Link -->
+    <p id="transactionHashContainer" style="text-align: center; display: none;">
+        <h2>Last Transaction: <span><a href="" target="_blank" id="transactionHashLink"></a></span></h2>
+    </p>
 
     <h2>List an Item for Sale</h2>
     <form id="listForm">
@@ -26,12 +207,12 @@
         <button type="submit">Purchase Item</button>
     </form>
 
-    <h2>Items for Sale</h2>
-    <button id="displayItems">Display Items</button>
+    <h2>Items on Blockchain</h2>
+    <button id="displayItems" onclick="displayItems()">Display Items</button>
     <ul id="itemsList"></ul>
 
-    <script src="app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <script src="app.js"></script>
 </body>
 
 </html>

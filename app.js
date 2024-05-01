@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-const contractAddress = '0xe9Df75402f6714719c2299c8F2d2930Fd85deD3b'; // replace with actual address
+const contractAddress = '0xe9Df75402f6714719c2299c8F2d2930Fd85deD3b';
 const contractABI = [
     {
         "inputs": [
@@ -146,7 +146,7 @@ const contractABI = [
         "stateMutability": "view",
         "type": "function"
     }
-]; // replace with actual ABI
+];
 let marketplaceContract;
 
 document.getElementById('connectWallet').addEventListener('click', connectWallet);
@@ -177,9 +177,10 @@ async function connectWallet() {
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
         marketplaceContract = new web3.eth.Contract(contractABI, contractAddress);
-        console.log("Wallet connected");
+        // console.log("Wallet connected");
+        showToast("Wallet connected", 'success');
     } catch (error) {
-        console.error("User denied account access", error);
+        showToast("User denied account access", 'error');
     }
 }
 
@@ -187,10 +188,12 @@ async function listItem(title, description, price) {
     const accounts = await web3.eth.getAccounts();
     const priceInWei = web3.utils.toWei(price, 'ether');
     try {
-        await marketplaceContract.methods.listItem(title, description, priceInWei).send({ from: accounts[0] });
-        console.log('Item listed successfully');
+        let response = await marketplaceContract.methods.listItem(title, description, priceInWei).send({ from: accounts[0] });
+        showToast('Item listed successfully', 'success');
+        updateTransactionLink(response.transactionHash);
+        displayItems();
     } catch (error) {
-        console.error('Error listing the item', error);
+        showToast('Error listing the item', 'error');
     }
 }
 
@@ -198,10 +201,11 @@ async function purchaseItem(itemId, price) {
     const accounts = await web3.eth.getAccounts();
     const priceInWei = web3.utils.toWei(price, 'ether');
     try {
-        await marketplaceContract.methods.purchaseItem(itemId).send({ from: accounts[0], value: priceInWei });
-        console.log('Item purchased successfully');
+        let response = await marketplaceContract.methods.purchaseItem(itemId).send({ from: accounts[0], value: priceInWei });
+        showToast('Item purchased successfully', 'success');
+        updateTransactionLink(response.transactionHash);
     } catch (error) {
-        console.error('Error purchasing the item', error);
+        showToast('Error purchasing the item', 'error');
     }
 }
 
@@ -212,12 +216,37 @@ async function displayItems() {
         itemsList.innerHTML = '';
         items.forEach(item => {
             const itemElement = document.createElement('li');
-            itemElement.innerText = `ID: ${item.id} - Title: ${item.title} - Price: ${web3.utils.fromWei(item.price, 'ether')} ETH - Sold: ${item.sold}`;
+            itemElement.innerHTML = `
+                <span class="item-section">ID: ${item.id}</span>
+                <span class="item-section">Title: ${item.title}</span>
+                <span class="item-section">Price: ${web3.utils.fromWei(item.price, 'ether')} ETH</span>
+                <span class="item-section ${item.sold ? 'sold' : 'not-sold'}">Sold: ${item.sold}</span>
+            `; // Use innerHTML to insert HTML content
             itemsList.appendChild(itemElement);
+            showToast('Item listed successfully', 'success');
         });
     } catch (error) {
-        console.error('Error fetching items', error);
+        showToast('Error displaying the item', 'error');
     }
+}
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type} show`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 3000);
+}
+
+function updateTransactionLink(hash) {
+    const hashLink = document.getElementById('transactionHashLink');
+    const hashContainer = document.getElementById('transactionHashContainer');
+    hashLink.href = `https://sepolia.etherscan.io/tx/${hash}`;
+    hashLink.textContent = hash; 
+    hashContainer.style.display = 'block';
 }
 
 // Call connectWallet when the page loads to check if MetaMask is connected
